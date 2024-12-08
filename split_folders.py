@@ -27,7 +27,7 @@ input_folder = "Data/plantvillage_dataset/color"
 
 splitfolders.ratio(
     input_folder,
-    output="Data/plantvillage_dataset/color_split",
+    output="Data/color_split",
     seed=42,
     ratio=(0.8, 0.1, 0.1),
     group_prefix=None,
@@ -42,7 +42,7 @@ splitfolders.ratio(
 
 splitfolders.fixed(
     input_folder,
-    output="Data/plantvillage_dataset/color_split_light",
+    output="Data/color_split_light",
     seed=42,
     fixed=(100, 25, 25),
     oversample=False,
