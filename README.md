@@ -70,7 +70,7 @@ Preprocessing calibré pour réaliser des prédictions avec **model_resnet_v7_be
 fonction de peprocessing propre au modèle ResNet-50  
 taille attendue des images en entrée : 224x224 pixels  
 
-Note : Le modèle préentraîné model_resnet_v7.keras est disponible en téléchargement (280 Mo) au lien qui suit.  
+Note : Le modèle préentraîné **model_resnet_v7.keras** est disponible en téléchargement (280 Mo) au lien qui suit.  
 https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing
 
 ## 4. Script split_folders.py
