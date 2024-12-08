@@ -49,24 +49,23 @@ Remarque: La data se trouve dans un dossier différent, nous avons utiliser des 
 
 
 
-## 2. Modèle model_cnn_4
-   
-   - Script **model_cnn_4.py**
-   Script pour construire, entraîner et évaluer le modèle model_cnn_4 présenté dans notre rapport de modélisation
+## 2. Modèle model_cnn_4  
 
-   - Modèle **model_cnn_4_best.keras**
-   Modèle préentraîné qui peut être utilisé pour faire des prédictions.
-   > Pas de preprocessing spécifique
-   > Taille attendue des images en entrée : 64x64 pixels
+- Script **model_cnn_4.py** : Script pour construire, entraîner et évaluer le modèle model_cnn_4 présenté dans notre rapport de modélisation  
+
+- Modèle **model_cnn_4_best.keras** : Modèle préentraîné qui peut être utilisé pour faire des prédictions.
+
+Pas de preprocessing spécifique  
+
+Taille attendue des images en entrée : 64x64 pixels  
 
    
 ## 3. Modèle model_resnet_v7
    
-   - Script **model_resnet_v7.py**
-   Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation
+   - Script **model_resnet_v7.py** : Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation
    
-   - Script **predictions_resnet_v7.py*
-   Script pour réaliser des predictions à partir d'un modèle entraîné.
+   - Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
+
    Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :
    > fonction de peprocessing propre au modèle ResNet-50
    > taille attendue des images en entrée : 224x224 pixels
