@@ -4,6 +4,12 @@
 
 Ce projet utilise **TensorFlow** et **Keras** pour construire un modèle de reconnaissance d'images de plantes basé sur un réseau de neurones convolutifs (CNN). L'objectif principal est de former un modèle capable de reconnaître et de classer des images en fonction de certaines caractéristiques. Ce projet implique la manipulation d'images, le prétraitement des données et la construction d'un modèle de classification.
 
+**Données source :**  
+kaggle  
+**PlantVillage Dataset**  
+Dataset of diseased plant leaf images and corresponding labels  
+https://www.kaggle.com/abdallahalidev/plantvillage-dataset  
+
 ## 1. Modèle TEM3
 ### Objectifs 
 
@@ -70,8 +76,10 @@ Preprocessing calibré pour réaliser des prédictions avec **model_resnet_v7_be
 fonction de peprocessing propre au modèle ResNet-50  
 taille attendue des images en entrée : 224x224 pixels  
 
-Note : Le modèle préentraîné **model_resnet_v7.keras** est disponible en téléchargement (280 Mo) au lien qui suit.  
-https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing
+Note 1 : Le modèle préentraîné **model_resnet_v7.keras** est disponible en téléchargement (280 Mo) au lien qui suit.  
+https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing  
+
+Note 2 : des images pour essais de prédiction, issues du web, se trouvent dans le répertoire **Data/images_pred/Apple___Apple_scab** à la racine de ce dépôt
 
 ## 4. Script split_folders.py
 
