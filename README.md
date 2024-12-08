@@ -55,6 +55,11 @@ Remarque: La data se trouve dans un dossier différent, nous avons utiliser des 
    - Script **model_cnn_4.py**
    Script pour construire, entraîner et évaluer le modèle model_cnn_4 présenté dans notre rapport de modélisation
 
+   - Modèle **model_cnn_4_best.keras**
+   Modèle préentraîné qui peut être utilisé pour faire des prédictions.
+   > Pas de preprocessing spécifique
+   > Taille attendue des images en entrée : 64x64 pixels
+
    
 ## 3. Modèle model_resnet_v7
    
@@ -67,7 +72,21 @@ Remarque: La data se trouve dans un dossier différent, nous avons utiliser des 
    > fonction de peprocessing propre au modèle ResNet-50
    > taille attendue des images en entrée : 224x224 pixels
 
-Note : Le modèle préentraîné model_resnet_v7 est disponible en téléchargement (280 Mo) au lien qui suit.
+Note : Le modèle préentraîné model_resnet_v7.keras est disponible en téléchargement (280 Mo) au lien qui suit.
 https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing
+
+## 4. Script split_folders.py
+
+Script pour diviser notre dataset en ensembles d'entraînement, validation et test.
+Basé sur la librairie splitfolders.
+
+Le répertoire "Data/plantvillage_dataset/color" contenant le dataset doit se 
+trouver au même niveau que ce script.
+
+Deux opérations sont réalisées :
+1/  Split du dataset selon le ratio 0.8, 0.1, 0.1
+    dans le répertoire de sortie "color_split"
+2/  Split du dataset avec un nombre d'images fixes par ensemble 100, 25, 25
+    dans le réperoire de sortie "color_split_light"
 
 
