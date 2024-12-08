@@ -48,8 +48,20 @@ Pour le modèle TEM3
 
 Remarque: La data se trouve dans un dossier différent, nous avons utiliser des chemins d'accès pour permettre la bonne execution du code
 
+
 ## 2. Modèle model_cnn_4
 
-- **
+- Script **model_cnn_4.py**
+Script pour construire, entraîner et évaluer le modèle model_cnn_4 présenté dans notre rapport de modélisation
+
 
 ## 3. Modèle model_resnet_v7
+
+- Script **model_resnet_v7.py**
+Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation
+
+- Script **predictions_resnet_v7.py*
+Script pour réaliser des predictions à partir d'un modèle entraîné.
+Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :
+> fonction de peprocessing propre au modèle ResNet-50
+> taille attendue des images en entrée : 224x224 pixels
