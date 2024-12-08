@@ -4,7 +4,8 @@
 
 Ce projet utilise **TensorFlow** et **Keras** pour construire un modèle de reconnaissance d'images de plantes basé sur un réseau de neurones convolutifs (CNN). L'objectif principal est de former un modèle capable de reconnaître et de classer des images en fonction de certaines caractéristiques. Ce projet implique la manipulation d'images, le prétraitement des données et la construction d'un modèle de classification.
 
-### Objectifs
+## 1. Modèle TEM3
+### Objectifs 
 
 - Prétraiter les images avec **ImageDataGenerator** de Keras.
 - Créer un modèle de classification basé sur un **réseau de neurones convolutifs (CNN)**.
