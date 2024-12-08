@@ -62,15 +62,15 @@ Taille attendue des images en entrée : 64x64 pixels
    
 ## 3. Modèle model_resnet_v7
    
-   - Script **model_resnet_v7.py** : Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation
+- Script **model_resnet_v7.py** : Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation.  
    
-   - Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
+- Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
 
-   Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :
-   > fonction de peprocessing propre au modèle ResNet-50
-   > taille attendue des images en entrée : 224x224 pixels
+Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :  
+fonction de peprocessing propre au modèle ResNet-50
+taille attendue des images en entrée : 224x224 pixels  
 
-Note : Le modèle préentraîné model_resnet_v7.keras est disponible en téléchargement (280 Mo) au lien qui suit.
+Note : Le modèle préentraîné model_resnet_v7.keras est disponible en téléchargement (280 Mo) au lien qui suit.  
 https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing
 
 ## 4. Script split_folders.py
