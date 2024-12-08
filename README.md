@@ -27,8 +27,7 @@ Pour le modèle TEM3
 ### Installation
 
 1. Clonez ce projet dans votre répertoire local :
-```bash
-   git clone https://github.com/Recoplantes/projet_recom_plantes_TEM3_.git
+   git clone https://github.com/Recoplantes/RECOPLANTES_PROJECT24.git
 
 2. Creez un enironnement virtuel :
     python -m venv env
