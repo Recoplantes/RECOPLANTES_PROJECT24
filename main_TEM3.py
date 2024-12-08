@@ -157,7 +157,7 @@ class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_r
                'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus', 'Tomato___healthy']
 
 # Image à tester
-path = '/content/drive/MyDrive/Data/plantvillage_dataset/color_split/test/Peach___Bacterial_spot/00ec2d81-1ac8-464f-af9f-40e8c28d67eb___Rutg._Bact.S 2002.JPG'
+path = 'Data/images_pred/Apple__Apple_scab/apple_scab.jpg'
 
 # Charger et prétraiter l'image
 test_image = load_img(path, target_size=(64, 64))  # Redimensionner l'image pour qu'elle corresponde à la taille d'entrée attendue par le modèle
