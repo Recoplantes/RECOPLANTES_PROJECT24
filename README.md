@@ -66,7 +66,7 @@ Taille attendue des images en entrée : 64x64 pixels
    
 - Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
 
-Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :  
+Preprocessing calibré pour réaliser des prédictions avec **model_resnet_v7_best.keras** :  
 fonction de peprocessing propre au modèle ResNet-50  
 taille attendue des images en entrée : 224x224 pixels  
 
