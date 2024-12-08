@@ -66,3 +66,8 @@ Remarque: La data se trouve dans un dossier différent, nous avons utiliser des 
    Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :
    > fonction de peprocessing propre au modèle ResNet-50
    > taille attendue des images en entrée : 224x224 pixels
+
+Note : Le modèle préentraîné model_resnet_v7 est disponible en téléchargement (280 Mo) au lien qui suit.
+https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing
+
+
