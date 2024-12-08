@@ -47,3 +47,9 @@ Pour le modèle TEM3
     python main_TEM3.py
 
 Remarque: La data se trouve dans un dossier différent, nous avons utiliser des chemins d'accès pour permettre la bonne execution du code
+
+## 2. Modèle model_cnn_4
+
+- **
+
+## 3. Modèle model_resnet_v7
