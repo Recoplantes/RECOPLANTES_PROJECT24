@@ -67,7 +67,7 @@ Taille attendue des images en entrée : 64x64 pixels
 - Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
 
 Preprocessing calibré pour réaliser des prédictions avec model_resnet_v7_best :  
-fonction de peprocessing propre au modèle ResNet-50
+fonction de peprocessing propre au modèle ResNet-50  
 taille attendue des images en entrée : 224x224 pixels  
 
 Note : Le modèle préentraîné model_resnet_v7.keras est disponible en téléchargement (280 Mo) au lien qui suit.  
@@ -75,16 +75,13 @@ https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=shari
 
 ## 4. Script split_folders.py
 
-Script pour diviser notre dataset en ensembles d'entraînement, validation et test.
-Basé sur la librairie splitfolders.
+Script pour diviser notre dataset en ensembles d'entraînement, validation et test.  
+Basé sur la librairie splitfolders.  
 
-Le répertoire "Data/plantvillage_dataset/color" contenant le dataset doit se 
-trouver au même niveau que ce script.
+Le répertoire "Data/plantvillage_dataset/color" contenant le dataset doit se trouver au même niveau que ce script.
 
 Deux opérations sont réalisées :
-1/  Split du dataset selon le ratio 0.8, 0.1, 0.1
-    dans le répertoire de sortie "color_split"
-2/  Split du dataset avec un nombre d'images fixes par ensemble 100, 25, 25
-    dans le réperoire de sortie "color_split_light"
+- Split du dataset selon le ratio 0.8, 0.1, 0.1 dans le répertoire de sortie "color_split"  
+- Split du dataset avec un nombre d'images fixes par ensemble 100, 25, 25 dans le réperoire de sortie "color_split_light"
 
 
