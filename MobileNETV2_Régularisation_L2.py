@@ -1,22 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Ce script utilise MobileNetV2, un modèle préentraîné sur ImageNet, adapté
-pour une tâche de classification d'images personnalisée. MobileNetV2 est
-particulièrement efficace pour des environnements contraints en ressources
-grès à son architecture optimisée pour la vitesse et la légèreté.
+# Ce script utilise MobileNetV2, un modèle préentraîné sur ImageNet, adapté
+# pour une tâche de classification d'images de fruits et légumes. MobileNetV2
+# est particulièrement efficace pour des environnements contraints en
+# ressources grâce à son architecture optimisée pour la vitesse et la légèreté.
+# En complément, une régularisation L2 est intégrée dans la dernière couche dense
+# pour limiter le surapprentissage en pénalisant les poids excessifs, garantissant
+# ainsi une meilleure généralisation du modèle.
+# 
+# Dans ce projet, les principales étapes incluent :
+# 1. Préparation des données avec augmentation pour améliorer la robustesse
+#    et réduire les biais liés aux variations des images.
+# 2. Utilisation de MobileNetV2 pour extraire des caractéristiques visuelles
+#    complexes à partir des images redimensionnées à 96x96 pixels.
+# 3. Ajout de couches personnalisées pour la classification des classes
+#    correspondantes aux fruits et légumes dans le dataset.
+# 4. Entraînement progressif par blocs de 5 époques pour surveiller les
+#    performances et prévenir le surapprentissage.
+# 5. Sauvegarde des résultats intermédiaires et combinaison des historiques
+#    pour finaliser l'entraînement avec 25 époques au total.
+# 
+# Chaque étape est soigneusement configurée pour tirer parti des capacités
+# de MobileNetV2 et de la régularisation L2, tout en respectant les contraintes
+# des ressources disponibles dans un environnement comme Google Colab.
 
-Dans ce projet, les principales étapes incluent :
-1. Préparation des données avec augmentation pour améliorer la robustesse.
-2. Utilisation de MobileNetV2 pour extraire les caractéristiques des images.
-3. Ajout de couches personnalisées pour la classification.
-4. Entraînement progressif par blocs pour réduire le surapprentissage.
-5. Fine-tuning du modèle pour améliorer les performances.
-
-Chaque étape est soigneusement configurée pour optimiser les performances
-tout en respectant les contraintes des ressources disponibles.
-"""
+# Pendant l'entraînement, le script était initialement conçu pour exécuter 20 époques
+# en blocs de 5. Cependant, au cours de l'exécution, des anomalies ont été observées :
+# - Bloc 1 : 5 époques ont été exécutées comme prévu.
+# - Bloc 2 : 10 époques ont été réalisées au lieu de 5.
+# - Bloc 3 : En cours pour 15 époques, j'ai décidé d'interrompre manuellement
+#   l'entraînement à la 10ème époque (soit la 25ème époque au total).
+# Cela a permis de limiter le risque de surapprentissage. Après l'entraînement,
+# un script a été utilisé pour sauvegarder manuellement l'historique du Bloc 3,
+# le combiner avec les blocs précédents, et poursuivre l'analyse sur l'ensemble de test.
 
 # IMPORTATION DES LIBRAIRIES
 import os
@@ -31,189 +48,219 @@ from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Dropout
 from keras.models import Sequential
 from keras import regularizers
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint
+import matplotlib.image as mpimg
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import datetime
 import json
+import seaborn as sns
 from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.regularizers import l2
+from sklearn.metrics import classification_report, confusion_matrix
 
-# DÉFINITION DES CHEMINS D'ACCÈS AUX DONNÉES
-# Chemins vers les ensembles d'entraînement, validation et test
-data_train_path = '/content/color_split/train'
-data_val_path = '/content/color_split/val'
-data_test_path = '/content/color_split/test'
+# DÉFINITION DES CHEMINS DACCÈS AUX DONNÉES
+train_path = './data/train'
+val_path = './data/val'
+test_path = './data/test'
+mob_path = './saved_models/'
+
+print("Train path exists:", os.path.exists(train_path))
+print("Validation path exists:", os.path.exists(val_path))
+print("Test path exists:", os.path.exists(test_path))
+if not os.path.exists(mob_path):
+    # Crée le répertoire local pour sauvegarder les modèles et historiques
+    os.makedirs(mob_path)
 
 # PRÉPARATION DES GÉNÉRATEURS D'IMAGES
-# Définition des paramètres pour les générateurs d'images
-batch_size = 16
-img_height = 96
-img_width = 96
-
-# Générateur pour les données d'entraînement avec augmentation de données
 train_data_generator = ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    rotation_range=15,
+    rotation_range=10,
     width_shift_range=0.1,
     height_shift_range=0.1,
     shear_range=0.1,
-    zoom_range=0.2,
+    zoom_range=0.1,
     horizontal_flip=True,
     fill_mode='nearest'
 )
 
-# Générateur pour les données de validation et de test sans augmentation
 val_test_data_generator = ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input
 )
 
-# Création des générateurs pour les ensembles d'entraînement, validation et test
 train_generator = train_data_generator.flow_from_directory(
-    directory=data_train_path,
-    target_size=(img_height, img_width),
-    batch_size=batch_size,
+    train_path,
+    target_size=(96, 96),
+    batch_size=16,
     class_mode='categorical'
 )
 
 val_generator = val_test_data_generator.flow_from_directory(
-    directory=data_val_path,
-    target_size=(img_height, img_width),
-    batch_size=batch_size,
+    val_path,
+    target_size=(96, 96),
+    batch_size=16,
     class_mode='categorical',
     shuffle=False
 )
-
 test_generator = val_test_data_generator.flow_from_directory(
-    directory=data_test_path,
-    target_size=(img_height, img_width),
-    batch_size=batch_size,
+    test_path,
+    target_size=(96, 96),
+    batch_size=16,
     class_mode='categorical',
     shuffle=False
 )
 
-# CONSTRUCTION DU MODÈLE AVEC MOBILENETV2
-# Initialisation du modèle préentraîné MobileNetV2 sans les couches supérieures
-base_model = MobileNetV2(
-    weights='imagenet',
-    include_top=False,
-    input_shape=(img_height, img_width, 3)
+# CONFIGURATION DES CALLBACKS
+checkpoint_best = ModelCheckpoint(
+    filepath=f'{mob_path}Anas_Essai_1_MOB_L2.keras',
+    monitor='val_accuracy',
+    save_best_only=True,
+    mode='max',
+    verbose=1
 )
-# On gèle les poids du modèle de base pour éviter qu'ils ne soient modifiés
-base_model.trainable = False
 
-# Ajout des couches personnalisées
-# Ces couches permettent d'adapter le modèle préentraîné à notre tâche
-inputs = keras.Input(shape=(img_height, img_width, 3))
-x = base_model(inputs, training=False)  # Extraction de caractéristiques
-x = tf.keras.layers.GlobalAveragePooling2D()(x)  # Réduction dimensionnelle
-x = Dropout(0.2)(x)  # Réduction du surapprentissage
-outputs = Dense(train_generator.num_classes, activation='softmax')(x)
+early_stopping = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    verbose=1,
+    restore_best_weights=True
+)
+
+# CONSTRUCTION DU MODÈLE AVEC MOBILENETV2 AVEC L2
+# Initialisation du modèle MobileNetV2 préentraîné avec réglage des couches givrées.
+# Charger MobileNetV2 préentraîné
+base_model = MobileNetV2(
+    weights='imagenet', include_top=False, input_shape=(96, 96, 3)
+)
+base_model.trainable = True
+
+# Geler les couches sauf les 20 dernières pour le fine-tuning
+for layer in base_model.layers[:-20]:
+    layer.trainable = False
+
+inputs = keras.Input(shape=(96, 96, 3))
+x = base_model(inputs, training=False)
+x = GlobalAveragePooling2D()(x)
+x = Dropout(0.2)(x)
+outputs = Dense(
+    train_generator.num_classes, activation='softmax', kernel_regularizer=l2(0.01)
+)(x)
 model = keras.Model(inputs, outputs)
 
-# Compilation du modèle
-# Configuration de l'optimiseur, de la fonction de perte et des métriques
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-# Résumé du modèle
-# Affiche la structure du modèle et les paramètres
+# Configurer le modèle avec l'optimiseur Adam, la perte catégorielle et les métriques
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
 model.summary()
 
 # ENTRAÎNEMENT DU MODÈLE PAR BLOCS
-# On entraîne le modèle par blocs pour éviter un surapprentissage
+# Formation progressive avec des blocs pour limiter les risques de surapprentissage.
 block_size = 5
 initial_epochs = 20
+current_date = datetime.datetime.now().strftime("%Y%m%d")
 
+# Boucle pour entraîner le modèle par blocs progressifs
 for i in range(0, initial_epochs, block_size):
-    print(f"Bloc d'époques {i + 1} à {min(i + block_size, initial_epochs)}")
     history_block = model.fit(
         train_generator,
         epochs=min(i + block_size, initial_epochs),
         validation_data=val_generator,
-        callbacks=[
-            ModelCheckpoint('best_model.h5', monitor='val_accuracy', save_best_only=True),
-            EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-        ],
+        callbacks=[checkpoint_best, early_stopping],
         verbose=1
     )
+    with open(f'{mob_path}history_block_{i + 1}_{current_date}.json', 'w') as f:
+        json.dump(history_block.history, f)
+    model.save(f'{mob_path}model_l2_after_block_{i + 1}_{current_date}.keras')
 
-# ÉVALUATION DU MODÈLE ET AFFICHAGE DES RESULTATS
-# Évaluation finale du modèle sur l'ensemble de test
+# Chemin vers l'historique partiel du Bloc 3
+bloc3_partial_path = f'{mob_path}manual_history_block3_1_to_8_{current_date}.json'
+
+with open(bloc3_partial_path, 'r') as f:
+    manual_block_3 = json.load(f)
+
+print("Clés dans l'historique du Bloc 3 :", manual_block_3.keys())
+print("Nombre d'époques enregistrées :", len(manual_block_3['accuracy']))
+
+bloc1_path = './saved_models/history_block_1_20241208.json'
+bloc2_path = './saved_models/history_block_6_20241208.json'
+bloc3_partial_path = './saved_models/manual_history_block3_1_to_8_20241208.json'
+
+with open(bloc1_path, 'r') as f:
+    history_block_1 = json.load(f)
+
+with open(bloc2_path, 'r') as f:
+    history_block_2 = json.load(f)
+
+with open(bloc3_partial_path, 'r') as f:
+    manual_block_3 = json.load(f)
+
+print("Bloc 1 : ", len(history_block_1['accuracy']))
+print("Bloc 2 : ", len(history_block_2['accuracy']))
+print("Bloc 3 : ", len(manual_block_3['accuracy']))
+
+# Combiner les historiques des trois blocs
+combined_history = {
+    key: history_block_1[key] + history_block_2[key] + manual_block_3[key]
+    for key in history_block_1.keys()
+}
+
+combined_path = f'{mob_path}combined_history_25_epochs_{current_date}.json'
+with open(combined_path, 'w') as f:
+    json.dump(combined_history, f)
+
+print(f"L'historique global (25 époques) a été sauvegardé dans {combined_path}.")
+
+# Tracer les courbes d'apprentissage
+plt.plot(combined_history['accuracy'], label='Train Accuracy')
+plt.plot(combined_history['val_accuracy'], label='Validation Accuracy')
+plt.legend()
+plt.title('Accuracy par époque')
+plt.show()
+
+plt.plot(combined_history['loss'], label='Train Loss')
+plt.plot(combined_history['val_loss'], label='Validation Loss')
+plt.legend()
+plt.title('Loss par époque')
+plt.show()
+
+# PRÉDICTIONS ET MATRICE DE CONFUSION
+# Évaluer les performances sur les données de test
 test_loss, test_accuracy = model.evaluate(test_generator)
-print(f'Loss: {test_loss}, Accuracy: {test_accuracy}')
+print(f"Test Loss: {test_loss}, Test Accuracy: {test_accuracy}")
 
-# PRÉDICTIONS ET RAPPORT DE CLASSIFICATION
-# Calcul des prédictions et comparaison avec les classes réelles
-test_generator.reset()
+# Gérer les prédictions et la matrice de confusion
 predictions = model.predict(test_generator)
-predicted_classes = np.argmax(predictions, axis=1)  # Classes prédites
-true_classes = test_generator.classes  # Classes réelles
+predicted_classes = np.argmax(predictions, axis=1)
+true_classes = test_generator.classes
 class_labels = list(test_generator.class_indices.keys())
 
-# Matrice de confusion
-from sklearn.metrics import confusion_matrix, classification_report
-import seaborn as sns
+print(classification_report(true_classes, predicted_classes, target_names=class_labels))
 
+# Générer la matrice de confusion normalisée
 cm = confusion_matrix(true_classes, predicted_classes)
+cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-# Affichage de la matrice de confusion
-plt.figure(figsize=(10, 8))
+# Configurer la taille et les limites d'affichage
+plt.figure(figsize=(18, 16))
 sns.heatmap(
-    cm,
+    cm_normalized,
     annot=True,
-    fmt='d',
+    fmt='.2f',
     cmap='Blues',
     xticklabels=class_labels,
-    yticklabels=class_labels
-)
-plt.title("Matrice de Confusion")
-plt.ylabel("Classes Réelles")
-plt.xlabel("Classes Prédites")
-plt.xticks(rotation=90)
-plt.yticks(rotation=0)
-plt.show()
-
-# FINE-TUNING DU MODÈLE
-# Déblocage des dernières couches du modèle pour améliorer ses performances
-base_model.trainable = True
-
-for layer in base_model.layers[:-30]:
-    layer.trainable = False  # On gèle toutes les couches sauf les 30 dernières
-
-# Recompilation du modèle avec un taux d'apprentissage réduit
-model.compile(
-    optimizer=keras.optimizers.Adam(1e-5),  # Taux d'apprentissage faible
-    loss='categorical_crossentropy',
-    metrics=['accuracy']
+    yticklabels=class_labels,
+    linewidths=0.5,
+    square=True,
+    cbar_kws={"shrink": 0.8}
 )
 
-fine_tune_epochs = 10
-# Entraînement des couches débloquées
-model.fit(
-    train_generator,
-    epochs=fine_tune_epochs,
-    validation_data=val_generator,
-    verbose=1
-)
-
-# Évaluation après fine-tuning
-# Évaluation finale pour vérifier l'amélioration après fine-tuning
-test_loss_ft, test_accuracy_ft = model.evaluate(test_generator)
-print(f'Loss après fine-tuning: {test_loss_ft}, Accuracy après fine-tuning: {test_accuracy_ft}')
-
-# TRACER LES COURBES D'APPRENTISSAGE
-# Visualisation des performances pendant l'entraînement
-history = history_block.history
-plt.figure(figsize=(10, 6))
-plt.plot(history['accuracy'], label='Précision Entraînement')
-plt.plot(history['val_accuracy'], label='Précision Validation')
-plt.xlabel('Époques')
-plt.ylabel('Précision')
-plt.legend()
-plt.title('Courbes de Précision')
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.plot(history['loss'], label='Perte Entraînement')
-plt.plot(history['val_loss'], label='Perte Validation')
-plt.xlabel('Époques')
-plt.ylabel('Perte')
-plt.legend()
-plt.title('Courbes de Perte')
+plt.xticks(rotation=45, fontsize=8, ha='right')
+plt.yticks(fontsize=8)
+plt.title("Matrice de Confusion Normalisée - MobileNetV2", fontsize=16)
+plt.xlabel("Classes Prédites", fontsize=12)
+plt.ylabel("Classes Réelles", fontsize=12)
+plt.tight_layout()
+plt.savefig('confusion_matrix_improved_v3.png', dpi=300)
 plt.show()
