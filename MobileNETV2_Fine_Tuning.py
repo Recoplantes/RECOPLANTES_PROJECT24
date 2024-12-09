@@ -37,9 +37,12 @@ from tensorflow.keras.applications import MobileNetV2
 
 # DÉFINITION DES CHEMINS D'ACCÈS AUX DONNÉES
 # Chemins vers les ensembles d'entraînement, validation et test
-data_train_path = '/content/color_split/train'
-data_val_path = '/content/color_split/val'
-data_test_path = '/content/color_split/test'
+data_train_path = './data/color_split/train'
+data_val_path = './data/color_split/val'
+data_test_path = './data/color_split/test'
+
+# Création des répertoires nécessaires
+os.makedirs('./models', exist_ok=True)
 
 # PRÉPARATION DES GÉNÉRATEURS D'IMAGES
 # Définition des paramètres pour les générateurs d'images
@@ -88,6 +91,24 @@ test_generator = val_test_data_generator.flow_from_directory(
     shuffle=False
 )
 
+# CONFIGURATION DES CALLBACKS
+current_date = datetime.datetime.now().strftime("%Y%m%d")  # Date courante formatée pour les fichiers
+
+checkpoint_best = ModelCheckpoint(  # Callback pour sauvegarder le meilleur modèle
+    filepath=f'./models/Anas_Essai_1_MOB_Repeat.keras',  # Chemin du fichier sauvegardé
+    monitor='val_accuracy',  # Surveiller la précision de validation
+    save_best_only=True,  # Sauvegarder uniquement le meilleur modèle
+    mode='max',  # Maximiser la métrique surveillée
+    verbose=1  # Afficher des messages pendant la sauvegarde
+)
+
+early_stopping = EarlyStopping(  # Callback pour arrêter l'entraînement si nécessaire
+    monitor='val_loss',  # Surveiller la perte de validation
+    patience=5,  # Nombre d'époques sans amélioration avant l'arrêt
+    verbose=1,  # Afficher des messages pendant l'arrêt
+    restore_best_weights=True  # Restaurer les poids du meilleur modèle
+)
+
 # CONSTRUCTION DU MODÈLE AVEC MOBILENETV2
 # Initialisation du modèle préentraîné MobileNetV2 sans les couches supérieures
 base_model = MobileNetV2(
@@ -127,11 +148,18 @@ for i in range(0, initial_epochs, block_size):
         epochs=min(i + block_size, initial_epochs),
         validation_data=val_generator,
         callbacks=[
-            ModelCheckpoint('best_model.h5', monitor='val_accuracy', save_best_only=True),
-            EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+            checkpoint_best,
+            early_stopping
         ],
         verbose=1
     )
+
+    # Sauvegarde de l'historique d'entraînement par bloc
+    with open(f'./models/history_block_{i + 1}_{current_date}.json', 'w') as f:
+        json.dump(history_block.history, f)
+
+    # Sauvegarde des poids après chaque bloc
+    model.save(f'./models/model_after_block_{i + 1}_{current_date}.keras')
 
 # ÉVALUATION DU MODÈLE ET AFFICHAGE DES RESULTATS
 # Évaluation finale du modèle sur l'ensemble de test
