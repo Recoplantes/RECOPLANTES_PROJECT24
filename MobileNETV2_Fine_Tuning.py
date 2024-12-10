@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Ce script utilise MobileNetV2, un modèle préentraîné sur ImageNet, adapté
