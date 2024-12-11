@@ -129,6 +129,17 @@ def create_model_TEM3():
 
     return model_TEM3
 
+# Compiler le modèle 
+model_TEM3.compile(optimizer=Adam(learning_rate=0.001),
+                     loss='categorical_crossentropy',
+                     metrics=['accuracy'])
+
+# Entraînement avec sauvegarde
+
+model_TEM3.fit(train_generator,
+                epochs=50,
+                validation_data=val_generator,
+                callbacks=[checkpoint])
 # Création du modèle TEM3
 model_TEM3 = create_model_TEM3()
 
