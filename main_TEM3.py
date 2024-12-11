@@ -167,6 +167,14 @@ class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_r
 # Image à tester
 path = 'Data/images_pred/Apple__Apple_scab/apple_scab.jpg'
 
+#Chargement du model 
+
+model_path = ""leila_best_model_cnn_TEM3.keras" 
+
+# chemin du modèle à charger
+
+classifier_cnn_TEM3 = keras.load_model(model_path)
+
 # Charger et prétraiter l'image
 test_image = load_img(path, target_size=(64, 64))  # Redimensionner l'image pour qu'elle corresponde à la taille d'entrée attendue par le modèle
 test_image = test_image.convert('RGB')
@@ -183,6 +191,7 @@ predicted_class_name = class_names[predicted_class_idx]
 culture_name, disease_name = predicted_class_name.split('___')[0], predicted_class_name.split('___')[1]
 
 # Affichage des résultats
+
 img = mpimg.imread(path)
 plt.axis('off')
 plt.text(-10, -15, f'Culture: {culture_name}\nMaladie: {disease_name}\nIndice de confiance: {predicted_proba}%', 
