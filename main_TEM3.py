@@ -91,7 +91,7 @@ test_generator = test_data_generator.flow_from_directory(
 )
 
 # Création du modèle TEM3 avec régularisation L2
-def create_model_TEM3():
+
     model_TEM3 = Sequential()
 
     # Couche d'entrée
@@ -127,7 +127,6 @@ def create_model_TEM3():
 
     model_TEM3.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    return model_TEM3
 
 # Compiler le modèle 
 model_TEM3.compile(optimizer=Adam(learning_rate=0.001),
@@ -140,8 +139,6 @@ model_TEM3.fit(train_generator,
                 epochs=50,
                 validation_data=val_generator,
                 callbacks=[checkpoint])
-# Création du modèle TEM3
-model_TEM3 = create_model_TEM3()
 
 # Charger les poids depuis la racine du projet
 weights_path = "leila_best_model_cnn_TEM3.keras"  
