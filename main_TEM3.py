@@ -167,6 +167,7 @@ model_path = ""leila_best_model_cnn_TEM3.keras"
 # chemin du modèle à charger
 
 classifier_cnn_TEM3 = keras.load_model(model_path)
+scores_cnn_REM3 = classifier_cnn_TEM3.evaluate(test_generator)
 
 # Charger et prétraiter l'image
 test_image = load_img(path, target_size=(64, 64))  # Redimensionner l'image pour qu'elle corresponde à la taille d'entrée attendue par le modèle
