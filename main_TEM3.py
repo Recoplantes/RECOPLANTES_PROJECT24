@@ -125,8 +125,6 @@ test_generator = test_data_generator.flow_from_directory(
     # Couche de sortie Dense 38 unités
     model_TEM3.add(Dense(units=38, activation='softmax'))
 
-    model_TEM3.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
 
 # Compiler le modèle 
 model_TEM3.compile(optimizer=Adam(learning_rate=0.001),
