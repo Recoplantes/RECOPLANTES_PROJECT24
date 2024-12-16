@@ -1,95 +1,108 @@
-# Projet de Reconnaissance de Plantes avec TensorFlow et Keras
+### Projet de Reconnaissance de Plantes avec TensorFlow et Keras
 
-## Description du projet
+## **Streamlit**
+- Lien : https://reco-plantes.streamlit.app/
+
+## **Description du projet**
 
 Ce projet utilise **TensorFlow** et **Keras** pour construire un modèle de reconnaissance d'images de plantes basé sur un réseau de neurones convolutifs (CNN). L'objectif principal est de former un modèle capable de reconnaître et de classer des images en fonction de certaines caractéristiques. Ce projet implique la manipulation d'images, le prétraitement des données et la construction d'un modèle de classification.
 
 **Données source :**  
-kaggle  
-**PlantVillage Dataset**  
-Dataset of diseased plant leaf images and corresponding labels  
-https://www.kaggle.com/abdallahalidev/plantvillage-dataset  
+- **Kaggle**  
+- **PlantVillage Dataset** : Dataset d'images de feuilles de plantes malades et saines, avec les étiquettes correspondantes.  
+- Lien : [PlantVillage Dataset](https://www.kaggle.com/abdallahalidev/plantvillage-dataset)
 
-## 1. Modèle TEM3
-### Objectifs 
+---
 
-- Prétraiter les images avec **ImageDataGenerator** de Keras.
-- Créer un modèle de classification basé sur un **réseau de neurones convolutifs (CNN)**.
-- Utiliser **ModelCheckpoint** pour sauvegarder le meilleur modèle pendant l'entraînement.
-- Gérer les défis liés à l'installation et la compatibilité des bibliothèques, en particulier avec **TensorFlow**.
+## **Prérequis**
 
-## Prérequis
+Avant de commencer, vous devez vous assurer que vous avez installé **Python 3.x** et les bibliothèques suivantes :
 
-Avant de commencer, vous devez vous assurer que vous avez installé Python 3.x et les bibliothèques suivantes :
+- TensorFlow 2.x
+- NumPy
+- Matplotlib
+- scikit-learn
+- PIL (Pillow)
 
-- **TensorFlow 2.x** (assurez-vous de vérifier la compatibilité de la version avec votre système)
-- **NumPy**
-- **Matplotlib**
-- **Keras**
-- **scikit-learn**
-- **PIL (Pillow)**
+---
 
-Pour le modèle TEM3
-### Installation
+## **Installation**
 
-1. Clonez ce projet dans votre répertoire local :
-   git clone https://github.com/Recoplantes/RECOPLANTES_PROJECT24.git
+1. **Clonez ce projet dans votre répertoire local :**
+   ```bash
+   git clone https://github.com/AnasMba19/Reco-Plantes.git
+   ```
 
-2. Creez un enironnement virtuel :
-    python -m venv env
+2. **Créez un environnement virtuel :**
+   ```bash
+   python -m venv env
+   ```
 
-3. Activez votre environnement virtuel :
-    Windows : .\env\Scripts\activate
-    Mac/Linux: source env/bin/activate
+3. **Activez votre environnement virtuel :**
+   - Windows : `\.\env\Scripts\activate`
+   - Mac/Linux : `source env/bin/activate`
 
-4. Installez les bibliothèques nécessaires avec pip :
-    pip install -r requirements.txt
+4. **Installez les dépendances nécessaires :**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-5. Préparez vos données d'images dans un répertoire dédié.
+5. **Préparez vos données d'images :**
+   Placez vos images dans le dossier approprié (`test_images/`) pour effectuer des prédictions.
 
-6. Exécutez le script principal pour entraîner le modèle ( Ce script contient la totalité des éléments necessaire a la bonne execution du code):
+6. **Exécutez l'application Streamlit pour visualiser les prédictions :**
+   ```bash
+   streamlit run app.py
+   ```
 
-    python main_TEM3.py
+---
 
-Remarque: La data se trouve dans un dossier différent, nous avons utiliser des chemins d'accès pour permettre la bonne execution du code
+## **Modèles utilisés**
 
+### **1. Modèle MobileNetV2**
 
+#### **Essai 1**
+- Entraînement avec régularisation L2 pour limiter le surapprentissage.  
+- Nombre d'epochs : **25**.  
 
-## 2. Modèle model_cnn_4  
+#### **Essai 2**
+- Entraînement en deux phases :  
+  - **20 epochs** pour l'entraînement initial.  
+  - **10 epochs** supplémentaires pour un fine-tuning précis.
 
-- Script **model_cnn_4.py** : Script pour construire, entraîner et évaluer le modèle model_cnn_4 présenté dans notre rapport de modélisation  
+---
 
-- Modèle **model_cnn_4_best.keras** : Modèle préentraîné qui peut être utilisé pour faire des prédictions.
+### **2. Modèle TEM3**
+- Prétraitement des images avec **ImageDataGenerator** de Keras.
+- Utilisation de **ModelCheckpoint** pour sauvegarder le meilleur modèle.
+- Formation avec compatibilité assurée pour **TensorFlow**.
 
-Pas de preprocessing spécifique  
+---
 
-Taille attendue des images en entrée : 64x64 pixels  
+### **3. Modèle ResNet_v7**
+- Construit à l'aide de l'architecture ResNet50.  
+- Taille des images en entrée : **224x224 pixels**.  
+- Prétraitement spécifique au modèle ResNet.
 
-   
-## 3. Modèle model_resnet_v7
-   
-- Script **model_resnet_v7.py** : Script pour construire, entraîner et évaluer le modèle model_resnet_v7 présenté dans notre rapport de modélisation.  
-   
-- Script **predictions_resnet_v7.py** : Script pour réaliser des predictions à partir d'un modèle entraîné.  
+---
 
-Preprocessing calibré pour réaliser des prédictions avec **model_resnet_v7_best.keras** :  
-fonction de peprocessing propre au modèle ResNet-50  
-taille attendue des images en entrée : 224x224 pixels  
+## **Exécution du projet**
 
-Note 1 : Le modèle préentraîné **model_resnet_v7.keras** est disponible en téléchargement (280 Mo) au lien qui suit.  
-https://drive.google.com/file/d/1ghV5R5nnPlkq4gT8CVVLv3cy6jXGbGT8/view?usp=sharing  
+Pour effectuer des prédictions sur des images :
 
-Note 2 : des images pour essais de prédiction, issues du web, se trouvent dans le répertoire **Data/images_pred/Apple___Apple_scab** à la racine de ce dépôt
+1. Lancez l'application Streamlit avec `app.py`.  
+2. Sélectionnez un modèle parmi les options disponibles.  
+3. Chargez une image depuis le dossier `test_images/`.  
+4. Obtenez la prédiction affichée dans l'interface utilisateur avec la classe et la confiance associées.
 
-## 4. Script split_folders.py
+---
 
-Script pour diviser notre dataset en ensembles d'entraînement, validation et test.  
-Basé sur la librairie splitfolders.  
+## **Structure du projet**
 
-Le répertoire "Data/plantvillage_dataset/color" contenant le dataset doit se trouver au même niveau que ce script.
+- `models/` : Contient les fichiers `.keras` pour les modèles préentrainés.
+- `test_images/` : Dossier pour tester des prédictions avec des images.
+- `app.py` : Script principal pour exécuter l'application Streamlit.
+- `requirements.txt` : Liste des dépendances nécessaires.
 
-Deux opérations sont réalisées :
-- Split du dataset selon le ratio 0.8, 0.1, 0.1 dans le répertoire de sortie "color_split"  
-- Split du dataset avec un nombre d'images fixes par ensemble 100, 25, 25 dans le réperoire de sortie "color_split_light"
-
+---
 
