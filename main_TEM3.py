@@ -22,6 +22,7 @@ Le modèle utilise l'optimiseur 'adam' et est conçu pour une classification mul
 # Importation des packages
 import os
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 from PIL import Image
 import tensorflow as tf
@@ -31,6 +32,7 @@ from keras.utils import to_categorical
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Dropout
 from keras.models import Sequential
 from keras import regularizers
+from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint
 import matplotlib.image as mpimg
@@ -42,8 +44,7 @@ np.random.seed(seed_value)
 random.seed(seed_value)
 tf.random.set_seed(seed_value)
 
-#Les chemins d'accès
-
+# Les chemins d'accès
 data_train_path = 'Data/color_split/train'
 data_val_path = 'Data/color_split/val'
 data_test_path = 'Data/color_split/test'
@@ -68,14 +69,14 @@ img_height = 64
 img_width = 64
 
 train_generator = train_data_generator.flow_from_directory(
-    directory='data_train_path',  
+    directory=data_train_path,  
     class_mode='categorical',
     target_size=(img_height, img_width),
     batch_size=batch_size
 )
 
 val_generator = val_data_generator.flow_from_directory(
-    directory='data_val_path',
+    directory=data_val_path,  
     class_mode='categorical',
     target_size=(img_height, img_width),
     batch_size=batch_size,
@@ -83,7 +84,7 @@ val_generator = val_data_generator.flow_from_directory(
 )
 
 test_generator = test_data_generator.flow_from_directory(
-    directory='data_test_path',
+    directory=data_test_path,  
     class_mode='categorical',
     target_size=(img_height, img_width),
     batch_size=batch_size,
@@ -91,58 +92,61 @@ test_generator = test_data_generator.flow_from_directory(
 )
 
 # Création du modèle TEM3 avec régularisation L2
+model_TEM3 = Sequential()
 
-    model_TEM3 = Sequential()
+# Couche d'entrée
+model_TEM3.add(Input(shape=(img_height, img_width, 3), name='Input'))
 
-    # Couche d'entrée
-    model_TEM3.add(Input(shape=(img_height, img_width, 3), name='Input'))
+# Première couche Conv2D + régularisation L2
+model_TEM3.add(Conv2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid',
+                      kernel_regularizer=regularizers.l2(0.01)))
+model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
 
-    # Première couche Conv2D + régularisation L2
-    model_TEM3.add(Conv2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid',
-                          kernel_regularizer=regularizers.l2(0.01)))
-    model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
+# Deuxième couche Conv2D + régularisation L2
+model_TEM3.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='valid',
+                      kernel_regularizer=regularizers.l2(0.01)))
+model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
 
-    # Deuxième couche Conv2D + régularisation L2
-    model_TEM3.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='valid',
-                          kernel_regularizer=regularizers.l2(0.01)))
-    model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
+# Troisième couche Conv2D + régularisation L2
+model_TEM3.add(Conv2D(filters=94, kernel_size=(3, 3), activation='relu', padding='valid',
+                      kernel_regularizer=regularizers.l2(0.01)))
+model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
 
-    # Troisième couche Conv2D + régularisation L2
-    model_TEM3.add(Conv2D(filters=94, kernel_size=(3, 3), activation='relu', padding='valid',
-                          kernel_regularizer=regularizers.l2(0.01)))
-    model_TEM3.add(MaxPooling2D(pool_size=(2, 2), strides=2, padding='valid'))
+# Dropout pour éviter l'overfitting
+model_TEM3.add(Dropout(rate=0.2))
 
-    # Dropout pour éviter l'overfitting
-    model_TEM3.add(Dropout(rate=0.2))
+# Couche Flatten
+model_TEM3.add(Flatten())
 
-    # Couche Flatten
-    model_TEM3.add(Flatten())
+# Couche Dense 128 unités + régularisation L2
+model_TEM3.add(Dense(units=128, activation='relu',
+                     kernel_regularizer=regularizers.l2(0.01)))
 
-    # Couche Dense 128 unités + régularisation L2
-    model_TEM3.add(Dense(units=128, activation='relu',
-                         kernel_regularizer=regularizers.l2(0.01)))
+# Couche de sortie Dense 38 unités
+model_TEM3.add(Dense(units=38, activation='softmax'))
 
-    # Couche de sortie Dense 38 unités
-    model_TEM3.add(Dense(units=38, activation='softmax'))
-
-
-# Compiler le modèle 
+# Compilation du modèle
 model_TEM3.compile(optimizer=Adam(learning_rate=0.001),
-                     loss='categorical_crossentropy',
-                     metrics=['accuracy'])
+                   loss='categorical_crossentropy',
+                   metrics=['accuracy'])
 
-# Entraînement avec sauvegarde
+# Callback pour sauvegarder le meilleur modèle
+checkpoint = ModelCheckpoint('best_model_TEM3.keras', save_best_only=True, monitor='val_loss', mode='min')
 
+# Entraînement du modèle
 model_TEM3.fit(train_generator,
-                epochs=50,
-                validation_data=val_generator,
-                callbacks=[checkpoint])
+               epochs=50,
+               validation_data=val_generator,
+               callbacks=[checkpoint])
 
-
-# Résumer le modèle pour vérifier qu'il est prêt
+# Résumer le modèle
 model_TEM3.summary()
 
-#Test/ Eval du model
+# Évaluation du modèle sur les données de test
+model_path = 'leila_best_model_TEM3.keras' 
+classifier_cnn_TEM3 = keras.models.load_model(model_path)
+scores_cnn_TEM3 = classifier_cnn_TEM3.evaluate(test_generator)
+print(f"Test Accuracy: {scores_cnn_TEM3[1] * 100:.2f}%")
 
 # Labels des classes (= noms des dossiers)
 class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
@@ -158,34 +162,22 @@ class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_r
                'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite', 'Tomato___Target_Spot', 
                'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus', 'Tomato___healthy']
 
-# Image à tester
-path = 'Data/images_pred/Apple__Apple_scab/apple_scab.jpg'
+# Prédiction sur une image unique
+path = 'Data/images_pred/Apple__Apple_scab/apple_scab.jpg'  
 
-#Chargement du model 
-model_path = ""leila_best_model_cnn_TEM3.keras" 
-
-# chemin du modèle à charger
-
-classifier_cnn_TEM3 = keras.load_model(model_path)
-scores_cnn_REM3 = classifier_cnn_TEM3.evaluate(test_generator)
-
-# Charger et prétraiter l'image
-test_image = load_img(path, target_size=(64, 64))  # Redimensionner l'image pour qu'elle corresponde à la taille d'entrée attendue par le modèle
+test_image = load_img(path, target_size=(64, 64))
 test_image = test_image.convert('RGB')
-test_image = img_to_array(test_image)  # Convertir l'image en tableau numpy
-test_image = test_image / 255.0  # Normaliser l'image en divisant par 255.0
+test_image = img_to_array(test_image)
+test_image = test_image / 255.0
 
-# Prédiction de probabilité pour chaque classe
-proba = model_TEM3.predict(np.expand_dims(test_image, axis=0))[0]  # Prédiction sur l'image d'entrée
-predicted_class_idx = np.argmax(proba)  # Indice de la classe prédite
-predicted_proba = round(100 * proba[predicted_class_idx], 2)  # Probabilité de la classe prédite
-
-# Extraire le nom de la culture et de la maladie à partir du nom de la classe prédite
+proba = classifier_cnn_TEM3.predict(np.expand_dims(test_image, axis=0))[0]
+predicted_class_idx = np.argmax(proba)
+predicted_proba = round(100 * proba[predicted_class_idx], 2)
 predicted_class_name = class_names[predicted_class_idx]
-culture_name, disease_name = predicted_class_name.split('___')[0], predicted_class_name.split('___')[1]
+
+culture_name, disease_name = predicted_class_name.split('___')
 
 # Affichage des résultats
-
 img = mpimg.imread(path)
 plt.axis('off')
 plt.text(-10, -15, f'Culture: {culture_name}\nMaladie: {disease_name}\nIndice de confiance: {predicted_proba}%', 
