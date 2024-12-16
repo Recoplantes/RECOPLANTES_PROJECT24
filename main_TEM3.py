@@ -140,15 +140,11 @@ model_TEM3.fit(train_generator,
                 validation_data=val_generator,
                 callbacks=[checkpoint])
 
-# Charger les poids depuis la racine du projet
-weights_path = "leila_best_model_cnn_TEM3.keras"  
-if os.path.exists(weights_path):
-    model_TEM3.load_weights(weights_path)
 
 # Résumer le modèle pour vérifier qu'il est prêt
 model_TEM3.summary()
 
-#Test du model
+#Test/ Eval du model
 
 # Labels des classes (= noms des dossiers)
 class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
@@ -168,7 +164,6 @@ class_names = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_r
 path = 'Data/images_pred/Apple__Apple_scab/apple_scab.jpg'
 
 #Chargement du model 
-
 model_path = ""leila_best_model_cnn_TEM3.keras" 
 
 # chemin du modèle à charger
